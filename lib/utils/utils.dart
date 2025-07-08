@@ -17,7 +17,7 @@ class Utils {
 
   static List<int?> getPagination({
     required int currentPage,
-    required int totalPage,
+    required int totalPages,
     int delta = 1
   }) {
 
@@ -25,8 +25,8 @@ class Utils {
     var left = currentPage - delta;
     var right = currentPage + delta;
 
-    for (var i=0; i<=totalPage; ++i) {
-      if (i == 1 || i == totalPage || ( i >= left && i <= right))
+    for (var i=0; i<totalPages; ++i) {
+      if (i == 0 || i == totalPages - 1 || (i >= left && i <= right))
         pageNumbers.add(i);
     }
 
@@ -41,6 +41,12 @@ class Utils {
     }
 
     return result;
+  }
+
+  static T? nullOr<T>(T? value, T Function(T) fn) {
+    if (value == null)
+      return null;
+    return fn(value);
   }
 
 }

@@ -2,6 +2,7 @@ name: custom_table
 description: "A new Flutter project."
 version: 0.0.1
 homepage:
+publish_to: 'none'
 
 environment:
   sdk: ^3.8.1
@@ -10,6 +11,9 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+
+  untitled_ui_icons:
+    git: https://github.com/Demahrix/untitled-ui-icons.git
 
 dev_dependencies:
   flutter_test:
@@ -38,11 +42,10 @@ flutter:
   # "family" key with the font family name, and a "fonts" key with a
   # list giving the asset and other descriptors for the font. For
   # example:
-  fonts:
-    - family: Montserrat
-      fonts:
-        - asset: assets/fonts/Montserrat-VariableFont_wght.ttf
-
+  # fonts:
+  #   - family: Montserrat
+  #     fonts:
+  #       - asset: assets/fonts/Montserrat-VariableFont_wght.ttf
   #   - family: Trajan Pro
   #     fonts:
   #       - asset: fonts/TrajanPro.ttf

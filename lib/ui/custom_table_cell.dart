@@ -26,12 +26,7 @@ class CustomTableCell extends StatelessWidget {
         style: TextStyle(
           color: theme.brightness == Brightness.light ? Colors.black87 : Colors.white,
           fontWeight: FontWeight.w500,
-          fontSize: 13.0,
-          fontFamily: 'Montserrat',
-          package: 'custom_table',
-          fontVariations: [
-            FontVariation('wght', 600)
-          ]
+          fontSize: 13.0
         ),
         child: child
       ),
