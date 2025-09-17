@@ -1,4 +1,5 @@
 import 'dart:io' show SocketException;
+import 'dart:developer';
 
 import 'package:custom_table/utils/utils.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +8,8 @@ import '../models/custom_table_row.dart';
 import 'custom_table.dart';
 import 'custom_table_cell.dart';
 
+
+typedef PaginationOptions = ({ bool? hide, Color? selectedColor, BoxDecoration? decoration });
 
 enum CustomPaginationTableState {
   loading, data, error
@@ -30,12 +33,12 @@ class CustomPaginationTable<T> extends StatelessWidget {
 
   final int pageSize;
   final CustomPaginationTableData<T> data;
-
+  /// Commence a 1
   final int? currentPage;
   final int? totalCount;
 
   final Map<int, double>? columnWidths;
-  final ({ Divider? horizontal, VerticalDivider? vertical, bool? hideHeaderHorizontalDivider })? dividers;
+  final CustomTableDividersOptions? dividers;
   final CustomTableRow? header;
   final CustomTableRow Function(BuildContext context, T value, int index) rowBuilder;
 
@@ -45,6 +48,8 @@ class CustomPaginationTable<T> extends StatelessWidget {
   final Widget Function()? loadingWidget;
   final Widget Function()? emptyWidgetBuidler;
   final Widget Function(Object? error)? errorWidgetBuilder;
+
+  final PaginationOptions? paginationOptions;
 
   const CustomPaginationTable({
     super.key,
@@ -56,12 +61,12 @@ class CustomPaginationTable<T> extends StatelessWidget {
     this.dividers,
     this.header,
     required this.rowBuilder,
-
     required this.onPageChanged,
     required this.onRetry,
     this.loadingWidget,
     this.emptyWidgetBuidler,
-    this.errorWidgetBuilder
+    this.errorWidgetBuilder,
+    this.paginationOptions
   });
 
   @override
@@ -87,7 +92,6 @@ class CustomPaginationTable<T> extends StatelessWidget {
             header: newHeader,
             children: [],
           ),
-
           SizedBox(
             height: pageSize * ROW_HEIGHT,
             child: loadingWidget?.call() ?? _loadingWidgetBuilder(),
@@ -112,11 +116,14 @@ class CustomPaginationTable<T> extends StatelessWidget {
 
       CustomPaginationTableState.data => CustomTable(
         header: newHeader,
+        columnWidths: columnWidths,
+        dividers: dividers,
         children: List.generate(values!.length, (index) => rowBuilder(context, values[index], index), growable: false),
       )
     };
 
-
+    if (paginationOptions?.hide == true)
+      return tableWidget;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -126,7 +133,6 @@ class CustomPaginationTable<T> extends StatelessWidget {
       ],
     );
   }
-
 
   Widget _loadingWidgetBuilder() {
     return Row(
@@ -164,82 +170,56 @@ class CustomPaginationTable<T> extends StatelessWidget {
     );
   }
 
-
   Widget _paginationWidget() {
-    var totalPages = (totalCount! / pageSize).ceil();
-    var paginationNumbers = currentPage == null || totalCount == null
+    var totalPages = totalCount == null || pageSize == 0 ? null : (totalCount! / pageSize).ceil();
+    var paginationNumbers = currentPage == null || totalCount == null || totalPages == null
       ? null
       : Utils.getPagination(currentPage: currentPage! - 1, totalPages: totalPages, delta: 1);
 
-    var paginationNumbersCount = paginationNumbers?.length;
-
-    print('$currentPage $totalPages / ${currentPage == totalPages}');
+    var paginationNumbersCount = paginationNumbers?.length ?? 0;
 
     return Container(
       padding: EdgeInsets.symmetric(
         horizontal: 16.0,
         vertical: 12.0
       ),      
-      decoration: BoxDecoration(
+      decoration: paginationOptions?.decoration ?? BoxDecoration(
         // color: Colors.grey[200],
         // borderRadius: BorderRadius.all(Radius.circular(4.0)),
-        border: Border(
-          top: BorderSide(color: Colors.grey[200]!)
-        )
+        border: Border(top: BorderSide(color: Colors.grey[200]!))
       ),
-      child: currentPage == null || totalCount == null
+      child: currentPage == null || totalCount == null || pageSize == 0
         ? null
         : Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
 
               Text.rich(TextSpan(
+                style: TextStyle(
+                  fontSize: 12.0,
+                  fontWeight: FontWeight.w500
+                ),
                 children: [
-
                   TextSpan(
-                    text: 'Showing ',
-                    style: TextStyle(
-                      fontSize: 12.0,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.black54
-                    ),
+                    text: 'Affichage de ',
+                    style: TextStyle(color: Colors.black54)
                   ),
+                  TextSpan(text: '${((currentPage! - 1) * pageSize) + 1}-${currentPage! * pageSize}'),
                   TextSpan(
-                    text: '${((currentPage! - 1) * pageSize) + 1}-${currentPage! * pageSize}',
-                    style: TextStyle(
-                      fontSize: 12.0,
-                      fontWeight: FontWeight.w500
-                    ),
+                    text: ' sur ',
+                    style: TextStyle(color: Colors.black54),
                   ),
+                  TextSpan(text: totalCount!.toString()),
                   TextSpan(
-                    text: ' of ',
-                    style: TextStyle(
-                      fontSize: 12.0,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.black54
-                    ),
-                  ),
-                  TextSpan(
-                    text: totalCount!.toString(),
-                    style: TextStyle(
-                      fontSize: 12.0,
-                      fontWeight: FontWeight.w500
-                    ),
-                  ),
-                  TextSpan(
-                    text: ' enteries',
-                    style: TextStyle(
-                      fontSize: 12.0,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.black54
-                    )
+                    text: ' entrées',
+                    style: TextStyle(color: Colors.black54)
                   )
                 ]
               )),
 
               Row(
                 mainAxisSize: MainAxisSize.min,
-                children: List.generate(paginationNumbersCount! + 2, (index) {
+                children: List.generate(paginationNumbersCount + 2, (index) {
                   var isLast = index == paginationNumbersCount + 1;
                   var pageNumber = index == 0 || isLast 
                     ? null
@@ -255,6 +235,7 @@ class CustomPaginationTable<T> extends StatelessWidget {
                       isNextButton: isLast,
                       isPrevButton: isPrevButton,
                       disabled: (currentPage == 1 && isPrevButton) || (isLast && currentPage == totalPages),
+                      paginationOptions: paginationOptions,
                       onTap: () {
                         if (pageNumber != null)
                           onPageChanged(pageNumber);
@@ -266,7 +247,34 @@ class CustomPaginationTable<T> extends StatelessWidget {
                     ),
                   );
                 }, growable: false),
+              ),
+
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text('Show per page'),
+                  const SizedBox(width: 12.0),
+                  SizedBox(
+                    width: 56.0,
+                    child: DropdownButtonFormField(
+                      onChanged: (index) {
+                        if (index != null)
+                          onPageChanged(index);
+                      },
+                      items: List.generate((totalPages ?? 0), (index) => DropdownMenuItem(
+                        value: index,
+                        child: Text((index + 1).toString())
+                      )),
+                      decoration: InputDecoration(
+                        isDense: true,
+                        border: OutlineInputBorder()
+                      ),
+                    ),
+                  )
+
+                ],
               )
+
             ],
           ),
     );
@@ -284,6 +292,7 @@ class _PaginationButton extends StatelessWidget {
   final bool isPrevButton;
   final bool disabled;
   final VoidCallback? onTap;
+  final PaginationOptions? paginationOptions;
 
   const _PaginationButton({
     required this.selected,
@@ -291,14 +300,19 @@ class _PaginationButton extends StatelessWidget {
     required this.isNextButton,
     required this.isPrevButton,
     required this.disabled,
-    this.onTap
+    this.onTap,
+    this.paginationOptions
   });
 
   @override
   Widget build(BuildContext context) {
+    var selectedColor = paginationOptions?.selectedColor ?? Colors.orange;
+
     var color = selected
-      ? Colors.white
+      ? selectedColor
       : disabled ? Colors.black12 : Colors.black87;
+
+    var selectedBackground = selectedColor.withValues(alpha: 0.12);
 
     return InkWell(
       onTap: selected || disabled || (isNextButton == false && isPrevButton == false && pageNumber == null)
@@ -310,8 +324,8 @@ class _PaginationButton extends StatelessWidget {
         alignment: Alignment.center,
         padding: EdgeInsets.symmetric(horizontal: 10.0),
         decoration: BoxDecoration(
-          color: selected ? Colors.orange : null,
-          border: selected ? Border.all(color: Colors.orange) : Border.all(color: Colors.black12),
+          color: selected ? selectedBackground : null,
+          border: selected ? null : Border.all(color: Colors.black12),
           borderRadius: BorderRadius.all(Radius.circular(6.0))
         ),
         child: isNextButton

@@ -3,11 +3,13 @@ import '../models/custom_table_row.dart';
 import '../utils/utils.dart';
 
 
+typedef CustomTableDividersOptions = ({ Divider? horizontal, VerticalDivider? vertical, bool? hideHeaderHorizontalDivider });
+
 class CustomTable extends StatelessWidget {
 
   final CustomTableRow? header;
   final Map<int, double>? columnWidths;
-  final ({ Divider? horizontal, VerticalDivider? vertical, bool? hideHeaderHorizontalDivider })? dividers;
+  final CustomTableDividersOptions? dividers;
   final List<CustomTableRow> children;
 
   const CustomTable({
@@ -34,20 +36,24 @@ class CustomTable extends StatelessWidget {
 
             var rowChildren = row.children;
 
-            return Container(
-              decoration: row.decoration,
-              child: Row(
-                children: Utils.separatedListBuilder(
-                  rowChildren.length,
-                  builder: (columnIndex) {
-                    var child = rowChildren[columnIndex];
-                    var columnWidth = columnWidths == null ? null : columnWidths![columnIndex];
-
-                    if (columnWidth != null)
-                      return SizedBox(width: columnWidth, child: child);
-                    return Expanded(child: child);
-                  },
-                  separatedBuilder: (_) => dividers?.vertical ?? const SizedBox()
+            return InkWell(
+              onTap: row.onTap,
+              mouseCursor: row.onTap == null ? null : SystemMouseCursors.click,
+              child: Container(
+                decoration: row.decoration,
+                child: Row(
+                  children: Utils.separatedListBuilder(
+                    rowChildren.length,
+                    builder: (columnIndex) {
+                      var child = rowChildren[columnIndex];
+                      var columnWidth = columnWidths == null ? null : columnWidths![columnIndex];
+              
+                      if (columnWidth != null)
+                        return SizedBox(width: columnWidth, child: child);
+                      return Expanded(child: child);
+                    },
+                    separatedBuilder: (_) => dividers?.vertical ?? const SizedBox()
+                  ),
                 ),
               ),
             );
