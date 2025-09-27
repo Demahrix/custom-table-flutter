@@ -1,5 +1,4 @@
 import 'dart:io' show SocketException;
-import 'dart:developer';
 
 import 'package:custom_table/utils/utils.dart';
 import 'package:flutter/material.dart';

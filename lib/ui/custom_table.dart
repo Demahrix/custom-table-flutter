@@ -37,6 +37,7 @@ class CustomTable extends StatelessWidget {
             var rowChildren = row.children;
 
             return InkWell(
+              key: row.key,
               onTap: row.onTap,
               mouseCursor: row.onTap == null ? null : SystemMouseCursors.click,
               child: Container(
