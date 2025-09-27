@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class CustomTableRow {
 
-  final LocalKey? key;
+  final Key? key;
   final VoidCallback? onTap;
   final Decoration? decoration;
   final List<Widget> children;
