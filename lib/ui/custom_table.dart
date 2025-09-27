@@ -25,45 +25,43 @@ class CustomTable extends StatelessWidget {
     var hasHeader = header != null;
     var rowsCount = children.length + (hasHeader ? 1 : 0);
 
-    return Container(
-      child: Column(
-        children: Utils.separatedListBuilder(
-          rowsCount,
-          builder: (rowIndex) {
-            var row = rowIndex == 0
-              ? hasHeader ? header! : children[rowIndex]
-              : children[rowIndex - (hasHeader ? 1 : 0)];
+    return Column(
+      children: Utils.separatedListBuilder(
+        rowsCount,
+        builder: (rowIndex) {
+          var row = rowIndex == 0
+            ? hasHeader ? header! : children[rowIndex]
+            : children[rowIndex - (hasHeader ? 1 : 0)];
 
-            var rowChildren = row.children;
+          var rowChildren = row.children;
 
-            return InkWell(
-              key: row.key,
-              onTap: row.onTap,
-              mouseCursor: row.onTap == null ? null : SystemMouseCursors.click,
-              child: Container(
-                decoration: row.decoration,
-                child: Row(
-                  children: Utils.separatedListBuilder(
-                    rowChildren.length,
-                    builder: (columnIndex) {
-                      var child = rowChildren[columnIndex];
-                      var columnWidth = columnWidths == null ? null : columnWidths![columnIndex];
-              
-                      if (columnWidth != null)
-                        return SizedBox(width: columnWidth, child: child);
-                      return Expanded(child: child);
-                    },
-                    separatedBuilder: (_) => dividers?.vertical ?? const SizedBox()
-                  ),
+          return InkWell(
+            key: row.key,
+            onTap: row.onTap,
+            mouseCursor: row.onTap == null ? null : SystemMouseCursors.click,
+            child: Container(
+              decoration: row.decoration,
+              child: Row(
+                children: Utils.separatedListBuilder(
+                  rowChildren.length,
+                  builder: (columnIndex) {
+                    var child = rowChildren[columnIndex];
+                    var columnWidth = columnWidths == null ? null : columnWidths![columnIndex];
+            
+                    if (columnWidth != null)
+                      return SizedBox(width: columnWidth, child: child);
+                    return Expanded(child: child);
+                  },
+                  separatedBuilder: (_) => dividers?.vertical ?? const SizedBox()
                 ),
               ),
-            );
-          },
-          separatedBuilder: (rowIndex) => dividers?.hideHeaderHorizontalDivider == true && hasHeader && rowIndex == 0
-            ? const SizedBox()
-            : dividers?.horizontal ?? const SizedBox()
-        )
-      ),
+            ),
+          );
+        },
+        separatedBuilder: (rowIndex) => dividers?.hideHeaderHorizontalDivider == true && hasHeader && rowIndex == 0
+          ? const SizedBox()
+          : dividers?.horizontal ?? const SizedBox()
+      )
     );
   }
 
