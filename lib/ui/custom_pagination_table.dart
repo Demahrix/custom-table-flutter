@@ -51,11 +51,8 @@ class CustomPaginationTable<T> extends StatelessWidget {
 
   final PaginationOptions? paginationOptions;
 
-  final Key? key1;
-
   const CustomPaginationTable({
     super.key,
-    this.key1,
     required this.pageSize,
     required this.data,
     this.currentPage,
@@ -183,7 +180,6 @@ class CustomPaginationTable<T> extends StatelessWidget {
     var paginationNumbersCount = paginationNumbers?.length ?? 0;
 
     return Container(
-      key: key1,
       padding: EdgeInsets.symmetric(
         horizontal: 16.0,
         vertical: 10.0
