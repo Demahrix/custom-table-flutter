@@ -103,6 +103,7 @@ class CustomPaginationTable<T> extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           CustomTable(
+            key: newHeader.key,
             header: newHeader,
             children: [],
           ),
