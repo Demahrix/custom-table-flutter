@@ -51,8 +51,11 @@ class CustomPaginationTable<T> extends StatelessWidget {
 
   final PaginationOptions? paginationOptions;
 
+  final Key? key1;
+
   const CustomPaginationTable({
     super.key,
+    this.key1,
     required this.pageSize,
     required this.data,
     this.currentPage,
@@ -180,9 +183,10 @@ class CustomPaginationTable<T> extends StatelessWidget {
     var paginationNumbersCount = paginationNumbers?.length ?? 0;
 
     return Container(
+      key: key1,
       padding: EdgeInsets.symmetric(
         horizontal: 16.0,
-        vertical: 12.0
+        vertical: 10.0
       ),      
       decoration: paginationOptions?.decoration ?? BoxDecoration(
         // color: Colors.grey[200],
@@ -227,7 +231,7 @@ class CustomPaginationTable<T> extends StatelessWidget {
                     : Utils.nullOr(paginationNumbers![index - 1], (e) => e + 1);
 
                   var isPrevButton = index == 0;
-      
+
                   return Padding(
                     padding: index == 0 ? EdgeInsets.zero : const EdgeInsets.only(left: 8.0),
                     child: _PaginationButton(
@@ -253,26 +257,35 @@ class CustomPaginationTable<T> extends StatelessWidget {
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text('Show per page'),
+                  Text('Afficher par page'),
                   const SizedBox(width: 12.0),
                   SizedBox(
-                    width: 56.0,
-                    child: DropdownButtonFormField(
-                      onChanged: (index) {
-                        if (index != null)
-                          onPageChanged(index);
-                      },
-                      items: List.generate((totalPages ?? 0), (index) => DropdownMenuItem(
-                        value: index,
-                        child: Text((index + 1).toString())
-                      )),
+                    width: 48.0,
+                    height: 32.0,
+                    child: InputDecorator(
                       decoration: InputDecoration(
                         isDense: true,
-                        border: OutlineInputBorder()
+                        border: OutlineInputBorder(borderSide: BorderSide(color: Colors.black45)),
+                        focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.black45)),
+                        enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.black45)),
+                        contentPadding: EdgeInsets.only(left: 2.0)
+                      ),
+                      child: DropdownButtonHideUnderline(
+                        child: DropdownButton(
+                          value: currentPage,
+                          // padding: EdgeInsets.zero,
+                          onChanged: (value) {
+                            if (value != null && value != currentPage)
+                              onPageChanged(value);
+                          },
+                          items: List.generate((totalPages ?? 0), (index) => DropdownMenuItem(
+                            value: index + 1,
+                            child: Text((index + 1).toString())
+                          ))
+                        ),
                       ),
                     ),
                   )
-
                 ],
               )
 
