@@ -1,4 +1,5 @@
 import 'dart:io' show SocketException;
+import 'dart:math' show min;
 
 import 'package:custom_table/utils/utils.dart';
 import 'package:flutter/material.dart';
@@ -203,7 +204,7 @@ class CustomPaginationTable<T> extends StatelessWidget {
                     text: 'Affichage de ',
                     style: TextStyle(color: Colors.black54)
                   ),
-                  TextSpan(text: '${((currentPage! - 1) * pageSize) + 1}-${currentPage! * pageSize}'),
+                  TextSpan(text: '${((currentPage! - 1) * pageSize) + 1}-${min(currentPage! * pageSize, totalCount ?? (2^53 - 1))}'),
                   TextSpan(
                     text: ' sur ',
                     style: TextStyle(color: Colors.black54),
